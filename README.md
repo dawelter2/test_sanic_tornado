@@ -10,9 +10,17 @@ Clone this repository, then create a new env by:
 
 ```    
 
+#### Start the server
+
+```
+    python server.py
+```
+
+#### Download
 Download a file by calling `client.py` with the filename as argument, e.g:
 
 ```
     python client.py small-size.jpg
 
 ```
+* Please make sure that the required file is in `file` directory
