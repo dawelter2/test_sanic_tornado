@@ -1,0 +1,10 @@
+/received/*
+/send/large-size.zip
+/venv/
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/.gitignore
+/.idea/.name
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/sanic-project.iml
+/.idea/vcs.xml
