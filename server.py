@@ -1,23 +1,19 @@
-from pathlib import Path
-
 import aiofiles
 from aiofiles import os as async_os
-from sanic import Sanic
-import asyncio
-from sanic.response import file_stream, redirect
+from sanic import Sanic, response
+from sanic.response import file_stream
 
 app = Sanic(__name__)
 
 
 @app.route('/upload', methods=["POST"])
 async def ProcessUpload(request):
-    print("upload required:", dir(request.files))
-    print("items: ", len(request.files.get("file")))
     item = request.files.get("file")
-    name = item.name
-    body = item.body
-    async with aiofiles.open(f"upload/{name}", 'wb') as f:
-        await f.write(body)
+    print("name: ", item.name)
+    print("type: ", item.type)
+    async with aiofiles.open(f"upload/{item.name}", 'wb') as f:
+        await f.write(item.body)
+    return response.empty()
 
 
 @app.route('/download')
