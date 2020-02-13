@@ -1,5 +1,5 @@
-/received/*
-/send/large-size.zip
+/download/*
+/files/large-size.zip
 /venv/
 /.idea/inspectionProfiles/profiles_settings.xml
 /.idea/.gitignore
@@ -8,3 +8,4 @@
 /.idea/modules.xml
 /.idea/sanic-project.iml
 /.idea/vcs.xml
+/upload/

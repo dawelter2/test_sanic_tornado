@@ -1,3 +1,4 @@
+import sys
 from pathlib import Path
 
 import requests
@@ -18,15 +19,21 @@ def GetLog():
             break
 
 
+def SendFile(filename):
+    print("sending file: ", filename)
+    files = {'file': open(f"files/{filename}", "rb")}
+    requests.post("http://localhost:8000/upload", files=files)
+
+
 def GetFile(file_name):
-    link = "http://localhost:8000/get_file"
-    file = Path(f"received/{file_name}")
+    link = "http://localhost:8000/download"
+    file = Path(f"download/{file_name}")
     file_counter = 0
     while True:
         if not file.exists():
             break
         file_counter += 1
-        file = Path(f"received/({file_counter}){file_name}")
+        file = Path(f"download/({file_counter}){file_name}")
     print("file name: ", file)
     r = requests.get(link, params={"file_name": file_name}, stream=True)
     total_size = int(r.headers.get("Content-Length", "0"))
@@ -37,6 +44,12 @@ def GetFile(file_name):
 
 
 if __name__ == '__main__':
-    GetFile("small-size.jpg")
-    GetFile("medium-size.msi")
-    GetFile("large-size.zip")
+    if len(sys.argv) < 2:
+        raise ValueError("parameters: please call as 'python client.py <download/upload/get_log> <Optional[filename]>'")
+
+    if sys.argv[1] == "download":
+        GetFile(sys.argv[2])
+    elif sys.argv[1] == "upload":
+        SendFile(sys.argv[2])
+    elif sys.argv[1] == "get_log":
+        GetLog()

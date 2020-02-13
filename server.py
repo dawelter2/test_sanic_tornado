@@ -4,15 +4,26 @@ import aiofiles
 from aiofiles import os as async_os
 from sanic import Sanic
 import asyncio
-from sanic.response import file_stream
+from sanic.response import file_stream, redirect
 
 app = Sanic(__name__)
 
 
-@app.route('/get_file')
-async def GetFile(request):
+@app.route('/upload', methods=["POST"])
+async def ProcessUpload(request):
+    print("upload required:", dir(request.files))
+    print("items: ", len(request.files.get("file")))
+    item = request.files.get("file")
+    name = item.name
+    body = item.body
+    async with aiofiles.open(f"upload/{name}", 'wb') as f:
+        await f.write(body)
+
+
+@app.route('/download')
+async def ProcessDownload(request):
     print("sending file...")
-    file_path = f"send/{request.args['file_name'][0]}"
+    file_path = f"files/{request.args['file_name'][0]}"
     file_stat = await async_os.stat(file_path)
     headers = {"Content-Length": str(file_stat.st_size)}
 
@@ -31,4 +42,4 @@ async def GetLog(request, ws):
 
 
 if __name__ == '__main__':
-    app.run(host="127.0.0.1", port=8000, debug=True)
+    app.run(host="0.0.0.0", port=8000, debug=True)
