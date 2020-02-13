@@ -20,7 +20,22 @@ Clone this repository, then create a new env by:
 Download a file by calling `client.py` with the filename as argument, e.g:
 
 ```
-    python client.py small-size.jpg
+    python client.py download small-size.jpg
 
 ```
+
+#### Upload
+
+```
+    python client.py upload small-size.jpg
+
+```
+
 * Please make sure that the required file is in `file` directory
+
+#### Get log
+
+```
+    python client.py get_log
+
+```
