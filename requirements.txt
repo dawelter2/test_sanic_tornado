@@ -3,3 +3,4 @@ tqdm
 requests
 sanic
 aiofiles
+tornado

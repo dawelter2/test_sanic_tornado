@@ -21,19 +21,21 @@ def GetLog():
 
 def SendFile(filename):
     print("sending file: ", filename)
-    files = {'file': open(f"files/{filename}", "rb")}
-    requests.post("http://localhost:8000/upload", files=files)
+    files = {'file': open(f"../files/{filename}", "rb")}
+    r = requests.post("http://localhost:8000/upload", files=files)
+    if r.status_code not in range(200, 299):
+        raise ValueError(f"Error sending file. code {r.status_code}")
 
 
 def GetFile(file_name):
     link = "http://localhost:8000/download"
-    file = Path(f"download/{file_name}")
+    file = Path(f"../files/download/{file_name}")
     file_counter = 0
     while True:
         if not file.exists():
             break
         file_counter += 1
-        file = Path(f"download/({file_counter}){file_name}")
+        file = Path(f"../files/download/({file_counter}){file_name}")
     print("file name: ", file)
     r = requests.get(link, params={"file_name": file_name}, stream=True)
     total_size = int(r.headers.get("Content-Length", "0"))

@@ -1,4 +1,3 @@
-/download/*
 /files/large-size.zip
 /venv/
 /.idea/inspectionProfiles/profiles_settings.xml
@@ -8,4 +7,5 @@
 /.idea/modules.xml
 /.idea/sanic-project.iml
 /.idea/vcs.xml
-/upload/
+/files/download/
+/files/upload/
