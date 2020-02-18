@@ -41,9 +41,11 @@ def GetFile(file_name):
 
 def SendFile(filename):
     print("sending file: ", filename)
-    files = {'file': open(f"../files/{filename}", "rb")}
-    r = requests.post("http://localhost:8888/upload", files=files)
-    # r = requests.post("https://httpbin.org/post", files=files)
+    headers = {
+        "filename": filename
+    }
+    with open(f"../files/{filename}", "rb") as f:
+        r = requests.post("http://localhost:8888/upload", data=f, headers=headers, stream=True)
     print(r.status_code)
     print(r.text)
     if r.status_code not in range(200, 299):
@@ -52,7 +54,9 @@ def SendFile(filename):
 
 if __name__ == '__main__':
     # GetLog()
-    # GetFile("large-size.zip")
-    SendFile("small-size.jpg")
-    SendFile("medium-size.msi")
-    SendFile("large-size.zip")
+    GetFile("giant-size.zip")
+    # SendFile("small-size.jpg")
+    # SendFile("medium-size.msi")
+    # SendFile("large-size.zip")
+    # SendFile("larger-size.zip")
+    # SendFile("giant-size.zip")

@@ -1,12 +1,17 @@
+from functools import partial
 from typing import Union, Optional, Awaitable
+from urllib.parse import unquote
+from uuid import uuid4
 
 import aiofiles
 import tornado
 import tornado.ioloop
 import tornado.options
 import tornado.web
+import tornado.httpserver
 import tornado.websocket
 from aiofiles import os as async_os
+from tornado import gen, httpclient
 
 
 class GetLog(tornado.websocket.WebSocketHandler):
@@ -43,29 +48,26 @@ class Download(tornado.web.RequestHandler):
                 await self.flush()
 
 
-SEPARATE = b'\r\n'
-
-
 @tornado.web.stream_request_body
 class Upload(tornado.web.RequestHandler):
     def initialize(self):
-        self.meta = dict()
-        self.fp = None
+        print("initializing upload..\n", self.request.headers)
+        self.bytes_read = 0
+        filename = self.request.headers.get("filename")
+        self.file_path = f"../files/upload/{filename}"
+        self.file = None
 
-    def data_received(self, chunk: bytes) -> Optional[Awaitable[None]]:
-        if self.fp is None:
-            split_chunk = chunk.split(SEPARATE)
-            self.meta['boundary'] = SEPARATE + split_chunk[0] + b'--' + SEPARATE
-            self.meta['header'] = SEPARATE.join(split_chunk[0:3])
-            self.meta['header'] += SEPARATE * 2
-            self.meta['filename'] = split_chunk[1].split(b'=')[-1].replace(b'"', b'').decode()
+    async def data_received(self, chunk):
+        if self.file is None:
+            self.file = await aiofiles.open(self.file_path, 'wb')
+        await self.file.write(chunk)
+        self.bytes_read += len(chunk)
 
-            chunk = chunk[len(self.meta['header']):]
-            self.fp = open(f"../files/upload/{self.meta['filename']}", "wb")
-        self.fp.write(chunk)
-
-    def post(self):
-        self.write(f"File {self.meta['filename']} was uploaded")
+    async def post(self):
+        mtype = self.request.headers.get("Content-Type")
+        print(f'PUT "{self.filename}" "{mtype}" {self.bytes_read} bytes')
+        await self.file.close()
+        self.write("OK")
 
 
 def main():
@@ -74,7 +76,9 @@ def main():
         (r"/download", Download),
         (r"/upload", Upload),
     ])
-    app.listen(8888)
+    server = tornado.httpserver.HTTPServer(app, max_buffer_size=1024 * 1024 * 1024 * 10)  # 10G
+    server.listen(8888)
+    # app.listen(8888)
     tornado.ioloop.IOLoop.current().start()
 
 
